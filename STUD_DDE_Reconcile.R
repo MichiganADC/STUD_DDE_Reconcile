@@ -18,6 +18,8 @@ cat("\nComparing files...\n\n")
 # Get list of files in source director "Summaries"
 path_to_summaries <- "Summaries/"
 files_list <- list.files(path_to_summaries)
+
+# Get unique IDs gleaned from filenames
 uniq_ids <- files_list %>% 
   str_match("^BH19STUD\\d{5}") %>% 
   unique() %>% 
@@ -26,6 +28,7 @@ uniq_ids <- files_list %>%
 # Loop over each unique ID
 for (id in uniq_ids) {
   
+  # Print STUD ID being processed
   cat(bold(cyan(paste0("STUD ID: ", id, "\n"))))
   
   # Get the files associated with each unique ID
@@ -33,16 +36,25 @@ for (id in uniq_ids) {
 
   # Test that there are exactly 2 files associated with each unique ID
   if (length(id_files) == 2L) {
+    
     # Get each XLSX file as a list of dfs
     list_dfs1 <- listify_xlsx(id_files[1], path = path_to_summaries)
     list_dfs2 <- listify_xlsx(id_files[2], path = path_to_summaries)
+    
     # Compare the list of dfs
     compare_dfs_list(list_dfs1, list_dfs2)
+    
   } else if (length(id_files) < 2L) {
+    
+    # Generate too-few-files warning
     warning(paste0("There are fewer than 2 files for STUD ID ", id))
-  } else if (length(id_files) > 2L) {
-    warning(paste0("There are more than 2 files for STUD ID ", id))
-  }
   
-}
+  } else if (length(id_files) > 2L) {
+    
+    # Generate too-many-files warning
+    warning(paste0("There are more than 2 files for STUD ID ", id))
+    
+  } # end if-elseif-elseif
+  
+} # end for
 

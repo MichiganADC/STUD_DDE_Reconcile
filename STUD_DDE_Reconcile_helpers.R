@@ -1,7 +1,8 @@
 # STUD_DDE_Reconcile_helpers.R
 
-suppressMessages( library(readxl)  )
-suppressMessages( library(crayon)  )
+suppressMessages( library(readxl) )
+suppressMessages( library(crayon) )
+suppressMessages( library(rlang)  )
 
 # Convert XLSX file to a list of worksheet dfs
 listify_xlsx <- function(file, path = NULL) {
@@ -69,26 +70,33 @@ listify_xlsx <- function(file, path = NULL) {
 
 # Custom comparison of lists containing worksheet dfs
 compare_dfs_list <- function(dfs_list_1, dfs_list_2) {
-  dfs_list_1_name <- rlang::as_string(rlang::ensym(dfs_list_1))
-  dfs_list_2_name <- rlang::as_string(rlang::ensym(dfs_list_2))
+  
+  dfs_list_1_name <- as_string(ensym(dfs_list_1))
+  dfs_list_2_name <- as_string(ensym(dfs_list_2))
   
   dfs_list_1_names <- names(dfs_list_1)[-1]
   dfs_list_2_names <- names(dfs_list_2)[-1]
   
-  # cat(paste0(xlsx1, " / \n", xlsx2, "\n"))
   cat(paste0(dfs_list_1[["file"]], " / \n", dfs_list_2[["file"]], "\n"))
   
+  # if spreadsheet lists are identical
   if (identical(dfs_list_1[-1], dfs_list_2[-1])) {
+    
     cat(bold(green(paste0("  Speadsheets match! \U1F197\n\n"))))
-    # print(paste0("  Speadsheets match! \U1F197\n\n"))
-  } else {
+    
+  } else { # spreadsheet lists aren't identical
+    
+    # iterate over each worksheet df in the spreadsheet list
     for (name in dfs_list_1_names) {
-      if (identical(dfs_list_1[[name]], dfs_list_2[[name]])) {
-        # cat(paste0("  Match \U2714\n",
-        #            "    in ", name, "\n"))
-      } else {
+      
+      # if a worksheet df isn't identical
+      if (!identical(dfs_list_1[[name]], dfs_list_2[[name]])) {
+        
+        # Print mismatch message
         cat(bold(red(paste0("  Mismatch\U00A1 "))))
         cat(paste0("\U274C\n", "    in ", bold(underline(name)), "\n"))
+        
+        # Print location of mismatch between two spreadsheet dfs
         for (i in seq_len(nrow(dfs_list_1[[name]]))) {
           for (j in seq_len(ncol(dfs_list_1[[name]]))) {
             if (!identical(dfs_list_1[[name]][[i, j]], 
@@ -98,9 +106,10 @@ compare_dfs_list <- function(dfs_list_1, dfs_list_2) {
             }
           } # end for (j ...)
         } # end for (i ...)
-      } # end if-else
+      } # end if
     } # end for (name ...)
     cat("\n")
+    
   } # end if-else
   
 }
