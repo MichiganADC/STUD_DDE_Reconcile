@@ -82,7 +82,11 @@ compare_dfs_list <- function(dfs_list_1, dfs_list_2) {
   # if spreadsheet lists are identical
   if (identical(dfs_list_1[-1], dfs_list_2[-1])) {
     
+    # Print happy match message
     cat(bold(green(paste0("  Speadsheets match! \U1F197\n\n"))))
+    
+    # If match, return 1
+    return(1L)
     
   } else { # spreadsheet lists aren't identical
     
@@ -109,6 +113,8 @@ compare_dfs_list <- function(dfs_list_1, dfs_list_2) {
       } # end if
     } # end for (name ...)
     cat("\n")
+    
+    return(0L)
     
   } # end if-else
   
